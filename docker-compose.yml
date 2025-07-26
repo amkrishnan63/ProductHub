@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: productboard
+      POSTGRES_PASSWORD: productboard
+      POSTGRES_DB: productboard
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend
+    command: npm run dev
+    volumes:
+      - ./backend:/app
+    ports:
+      - '4000:4000'
+    environment:
+      DATABASE_URL: postgres://productboard:productboard@db:5432/productboard
+    depends_on:
+      - db
+  frontend:
+    build: ./frontend
+    command: npm start
+    volumes:
+      - ./frontend:/app
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+volumes:
+  db_data: 
